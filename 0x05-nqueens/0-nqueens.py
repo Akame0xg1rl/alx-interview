@@ -1,49 +1,44 @@
 #!/usr/bin/python3
+""" N queens """
 import sys
 
-def print_usage_and_exit():
+
+if len(sys.argv) > 2 or len(sys.argv) < 2:
     print("Usage: nqueens N")
-    sys.exit(1)
+    exit(1)
 
-def solve_nqueens(N):
-    solutions = []
-    board = [-1] * N
-    solve_recursive(N, 0, board, solutions)
-    for solution in solutions:
-        print(solution)
+if not sys.argv[1].isdigit():
+    print("N must be a number")
+    exit(1)
 
-def solve_recursive(N, row, board, solutions):
-    if row == N:
-        solutions.append([[i, board[i]] for i in range(N)])
-        return
-    
-    for col in range(N):
-        if is_valid_position(row, col, board):
-            board[row] = col
-            solve_recursive(N, row + 1, board, solutions)
-            board[row] = -1  # backtrack
+if int(sys.argv[1]) < 4:
+    print("N must be at least 4")
+    exit(1)
 
-def is_valid_position(row, col, board):
-    for i in range(row):
-        if board[i] == col or abs(board[i] - col) == abs(i - row):
-            return False
-    return True
+n = int(sys.argv[1])
 
-def main():
-    if len(sys.argv) != 2:
-        print_usage_and_exit()
-    
-    try:
-        N = int(sys.argv[1])
-    except ValueError:
-        print("N must be a number")
-        sys.exit(1)
 
-    if N < 4:
-        print("N must be at least 4")
-        sys.exit(1)
-    
-    solve_nqueens(N)
+def queens(n, i=0, a=[], b=[], c=[]):
+    """ find possible positions """
+    if i < n:
+        for j in range(n):
+            if j not in a and i + j not in b and i - j not in c:
+                yield from queens(n, i + 1, a + [j], b + [i + j], c + [i - j])
+    else:
+        yield a
 
-if __name__ == "__main__":
-    main()
+
+def solve(n):
+    """ solve """
+    k = []
+    i = 0
+    for solution in queens(n, 0):
+        for s in solution:
+            k.append([i, s])
+            i += 1
+        print(k)
+        k = []
+        i = 0
+
+
+solve(n)
